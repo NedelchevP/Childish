@@ -36,24 +36,13 @@ class ApiStats(GenericViewSet):
             from django.db.models import Count, Sum
             from django.db.models.functions import ExtractMonth
 
-            month_queryset = self.queryset.values(
-                'id',
-                'date',
-                'products'
-            ).annotate(
-                month=ExtractMonth('date')
-            )
+            month_queryset = self.queryset.values('id', 'date', 'products').annotate(month=ExtractMonth('date'))
 
+            final_queryset = None
             if serializer.validated_data['metric'] == 'price':
-                final_queryset = month_queryset.values('month').annotate(
-                    value=Sum('products__price')
-                ).order_by()
+                final_queryset = month_queryset.values('month').annotate(value=Sum('products__price'))
             elif serializer.validated_data['metric'] == 'count':
-                final_queryset = month_queryset.values('month').annotate(
-                    value=Count('products'),
-                ).order_by()
+                final_queryset = month_queryset.values('month').annotate(value=Count('products'))
             return Response(final_queryset)
-        else:
-            print("no")
 
         return Response()
