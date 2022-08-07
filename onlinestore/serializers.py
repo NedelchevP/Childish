@@ -12,3 +12,10 @@ class OrdersSerializer(serializers.ModelSerializer):
     class Meta:
         model = Orders
         fields = ['id', 'date', 'products']
+
+
+class ApiStatsSerializer(serializers.Serializer):
+    date_start = serializers.DateField()
+    date_end = serializers.DateField()
+    metric = serializers.ChoiceField(choices=['price', 'count'])
+
