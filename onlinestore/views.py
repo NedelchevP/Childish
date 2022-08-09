@@ -33,10 +33,15 @@ class ApiStats(GenericViewSet):
     def stats(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         if serializer.is_valid(raise_exception=True):
-            from django.db.models import Count, Sum
-            from django.db.models.functions import ExtractMonth
+            from django.db.models import Count, Sum, CharField, Value
+            from django.db.models.functions import ExtractMonth, ExtractYear, Concat
 
-            month_queryset = self.queryset.values('id', 'date', 'products').annotate(month=ExtractMonth('date'))
+            month_queryset = self.queryset.values('id', 'date', 'products').annotate(month_num=ExtractMonth('date'),
+                                                                                     year_num=ExtractYear('date'),
+                                                                                     month=Concat('year_num',
+                                                                                                  Value('-'),
+                                                                                                  'month_num',
+                                                                                                  output_field=CharField()))
 
             final_queryset = None
             if serializer.validated_data['metric'] == 'price':
@@ -44,5 +49,3 @@ class ApiStats(GenericViewSet):
             elif serializer.validated_data['metric'] == 'count':
                 final_queryset = month_queryset.values('month').annotate(value=Count('products'))
             return Response(final_queryset)
-
-        return Response()
