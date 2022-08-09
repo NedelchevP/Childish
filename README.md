@@ -2,6 +2,8 @@
 #### created by Pavel Nedelchev
 
 ### <i>To do the initial setup if starting fresh:</i>
+- python -m venv venv
+- source venv/bin/activate
 - pip install -r requirements.txt
 - python manage.py migrate
 - python manage.py loaddata onlinestore/fixtures/product_fixtures.json --app onlinestore.product
